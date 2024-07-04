@@ -3,39 +3,42 @@ package store
 import (
 	"database/sql"
 	"fmt"
-	"strings"
+
+	"github.com/uptrace/bun/driver/pgdriver"
 )
 
 const (
 	Product_Postgres = "postgres"
 )
 
-func OpenPostgres(conf *Configure) (*sql.DB, error) {
-	sslmode := func(sslmode bool) string {
-		if sslmode {
-			return "sslmode=enable"
+func OpenPostgres(conf *Configure) *sql.DB {
+	dsn := func() string {
+		host := func() string {
+			if conf.Host == "" {
+				return "localhost"
+			}
+			return conf.Host
 		}
-		return "sslmode=disable"
-	}
-	f := func(key, defaultvalue string, value ...string) string {
-		if len(value) == 0 {
-			return fmt.Sprintf("%s=%s", key, defaultvalue)
+		port := func() int {
+			if conf.Port <= 0 || conf.Port >= 65535 {
+				return 5432
+			}
+			return conf.Port
 		}
-		return fmt.Sprintf("%s=%s", key, value[0])
-	}
-	formatdsn := func() (string, error) {
-		values := []string{
-			f("host", "localhost", conf.Host),
-			f("dbname", "postgres", conf.Database),
-			f("user", "postgres", conf.User),
-			f("password", conf.Password),
-			sslmode(conf.SSLMode),
+		user := func() string {
+			if conf.User == "" {
+				return "postgres"
+			}
+			return conf.User
 		}
-		return strings.Join(values, " "), nil
+		dbname := func() string {
+			if conf.Database == "" {
+				return "postgres"
+			}
+			return conf.Database
+		}
+		// "postgres://postgres:@localhost:5432/test?sslmode=disable"
+		return fmt.Sprintf("%s://%s:%s@%s:%d/%s?sslmode=disable", Product_Postgres, user(), conf.Password, host(), port(), dbname())
 	}
-	dsn, err := formatdsn()
-	if err != nil {
-		return nil, err
-	}
-	return sql.Open(Product_Postgres, dsn)
+	return sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(dsn())))
 }
