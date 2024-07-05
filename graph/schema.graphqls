@@ -22,7 +22,7 @@ input getTodo {
 
 type Query {
   todos: [Todo!]!
-  getTodos(input: getTodo): [Todo]!
+  getTodos(input: [getTodo]!): [Todo]!
 }
 
 input NewTodo {

@@ -52,7 +52,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetTodos func(childComplexity int, input *model.GetTodo) int
+		GetTodos func(childComplexity int, input []*model.GetTodo) int
 		Todos    func(childComplexity int) int
 	}
 
@@ -74,7 +74,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Todos(ctx context.Context) ([]*model.Todo, error)
-	GetTodos(ctx context.Context, input *model.GetTodo) ([]*model.Todo, error)
+	GetTodos(ctx context.Context, input []*model.GetTodo) ([]*model.Todo, error)
 }
 
 type executableSchema struct {
@@ -118,7 +118,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetTodos(childComplexity, args["input"].(*model.GetTodo)), true
+		return e.complexity.Query.GetTodos(childComplexity, args["input"].([]*model.GetTodo)), true
 
 	case "Query.todos":
 		if e.complexity.Query.Todos == nil {
@@ -328,10 +328,10 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_getTodos_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *model.GetTodo
+	var arg0 []*model.GetTodo
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalOgetTodo2ᚖgographqlᚋgraphᚋmodelᚐGetTodo(ctx, tmp)
+		arg0, err = ec.unmarshalNgetTodo2ᚕᚖgographqlᚋgraphᚋmodelᚐGetTodo(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -511,7 +511,7 @@ func (ec *executionContext) _Query_getTodos(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetTodos(rctx, fc.Args["input"].(*model.GetTodo))
+		return ec.resolvers.Query().GetTodos(rctx, fc.Args["input"].([]*model.GetTodo))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3791,6 +3791,23 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNgetTodo2ᚕᚖgographqlᚋgraphᚋmodelᚐGetTodo(ctx context.Context, v interface{}) ([]*model.GetTodo, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.GetTodo, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOgetTodo2ᚖgographqlᚋgraphᚋmodelᚐGetTodo(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
 }
 
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {

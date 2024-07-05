@@ -21,11 +21,13 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 }
 
 // GetTodos is the resolver for the getTodos field.
-func (r *queryResolver) GetTodos(ctx context.Context, input *model.GetTodo) ([]*model.Todo, error) {
+func (r *queryResolver) GetTodos(ctx context.Context, input []*model.GetTodo) ([]*model.Todo, error) {
 	var result []*model.Todo
 	for _, v := range todos {
-		if v.ID == *input.ID {
-			result = append(result, v)
+		for _, req := range input {
+			if v.ID == *req.ID {
+				result = append(result, v)
+			}
 		}
 	}
 	return result, nil
