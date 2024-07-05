@@ -50,3 +50,87 @@ GraphQLの実装には直接関係しない。
 ORMとして利用する形とするが、GraphQLの実装とは直接関係しない。
 実際にGraphQLを開発する場合、データベースとの関係が発生するため、実装することとなる。
 
+## Getting Started
+
+goをインストール
+
+バージョンは **1.22.1** 以上を推奨
+
+makeがインストールされている場合
+```
+$ make go/run
+```
+
+makeがインストールされていない場合
+```
+go run cmd/server.go
+```
+
+ブラウザで http://localhost:9980/ にアクセス
+
+クエリを実行してみる
+
+### シンプルなクエリを試してみる
+
+```
+query {
+  todos {
+    id
+  	text
+	}
+}
+```
+このような出力が得られる
+```
+{
+  "data": {
+    "todos": [
+      {
+        "id": "0",
+        "text": "mail check"
+      },
+      {
+        "id": "1",
+        "text": "MTG"
+      }
+    ]
+  }
+}
+```
+
+### 変数を使ったクエリを試してみる
+
+```
+query ($todos: [getTodo]!){
+  getTodos(input: $todos) {
+    id
+    text
+  }
+}
+```
+```Variables
+{
+  "todos": [{"id":"0"},{"id":"1"}]
+}
+```
+出力はさっきと同じだろう
+```
+{
+  "data": {
+    "todos": [
+      {
+        "id": "0",
+        "text": "mail check"
+      },
+      {
+        "id": "1",
+        "text": "MTG"
+      }
+    ]
+  }
+}
+```
+
+試しに、変数のtodos配列にあるオブジェクトを一つ消す。
+思った通りに動くだろう。
+
